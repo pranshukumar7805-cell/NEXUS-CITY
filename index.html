@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NEXUS CITY | Citizen Life Simulation</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#060a10;
+  color:#fff;
+  min-height:100vh;
+}
+
+header{
+  background:#0b111a;
+  border-bottom:1px solid #1c2a3a;
+  padding:16px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.header{
+  max-width:1250px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:bold;
+  letter-spacing:3px;
+}
+
+.subtitle{
+  color:#718097;
+  font-size:10px;
+  margin-top:4px;
+  letter-spacing:1px;
+}
+
+.status{
+  padding:9px 13px;
+  border-radius:20px;
+  border:1px solid #285536;
+  background:#0c1911;
+  color:#65e58a;
+  font-size:11px;
+}
+
+main{
+  max-width:1250px;
+  margin:auto;
+  padding:20px 15px 40px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+h2{
+  font-size:22px;
+}
+
+.clock{
+  color:#7d8ba0;
+  font-size:12px;
+  margin-top:5px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#0c131d;
+  border:1px solid #1a2939;
+  border-radius:12px;
+  padding:13px;
+}
+
+.stat-title{
+  color:#728096;
+  font-size:10px;
+  margin-bottom:7px;
+}
+
+.stat-value{
+  font-size:19px;
+  font-weight:bold;
+}
+
+.green{color:#65e58a}
+.yellow{color:#f1c85b}
+.red{color:#ff7070}
+
+.city-box{
+  background:#081019;
+  border:1px solid #1a2b3c;
+  border-radius:15px;
+  overflow:hidden;
+}
+
+.city-header{
+  padding:13px 15px;
+  background:#0b141f;
+  border-bottom:1px solid #1a2939;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.city-header span{
+  color:#728096;
+  font-size:11px;
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  background:#101923;
+}
+
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  padding:11px 15px;
+  background:#0b141f;
+  color:#8290a4;
+  font-size:10px;
+}
+
+.section-title{
+  margin:25px 0 12px;
+  font-size:17px;
+}
+
+.panels{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.panel{
+  background:#0c131d;
+  border:1px solid #1a2939;
+  border-radius:13px;
+  padding:16px;
+}
+
+.panel h3{
+  font-size:14px;
+  margin-bottom:13px;
+}
+
+.system{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid #182433;
+  font-size:12px;
+}
+
+.system:last-child{
+  border-bottom:0;
+}
+
+.system span:first-child{
+  color:#8390a3;
+}
+
+.citizen-list{
+  max-height:300px;
+  overflow-y:auto;
+}
+
+.citizen{
+  padding:11px 0;
+  border-bottom:1px solid #182433;
+}
+
+.citizen:last-child{
+  border-bottom:0;
+}
+
+.citizen-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.citizen-name{
+  font-size:12px;
+  font-weight:bold;
+}
+
+.citizen-id{
+  color:#68778b;
+  font-size:9px;
+}
+
+.citizen-info{
+  color:#8290a3;
+  font-size:10px;
+  margin-top:5px;
+}
+
+.activity{
+  color:#65e58a;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:9px;
+  border:1px solid #26384b;
+  background:#101b27;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  background:#172637;
+}
+
+.stop{
+  color:#ff7777;
+  border-color:#5b3030;
+}
+
+.restore{
+  color:#70e893;
+  border-color:#295738;
+}
+
+.log{
+  max-height:230px;
+  overflow-y:auto;
+}
+
+.log-item{
+  padding:9px 0;
+  border-bottom:1px solid #182433;
+  color:#8491a3;
+  font-size:11px;
+}
+
+.log-item:last-child{
+  border:0;
+}
+
+footer{
+  text-align:center;
+  padding:25px;
+  color:#4f5c6d;
+  font-size:10px;
+}
+
+@media(max-width:900px){
+
+  .stats{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+}
+
+@media(max-width:600px){
+
+  .header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .panels{
+    grid-template-columns:1fr;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="header">
+
+<div>
+<div class="logo">🏙️ NEXUS CITY</div>
+<div class="subtitle">AUTONOMOUS AI CITY SIMULATION</div>
+</div>
+
+<div class="status" id="aiStatus">
+● AI AUTONOMY ACTIVE
+</div>
+
+</div>
+
+</header>
+
+
+<main>
+
+<div class="top">
+
+<div>
+
+<h2>City Command Center</h2>
+
+<div class="clock" id="cityClock">
+Day 1 • 06:00 • Morning
+</div>
+
+</div>
+
+<div class="clock" id="simStatus">
+Simulation running
+</div>
+
+</div>
+
+
+<!-- CITY STATISTICS -->
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-title">👥 CITIZENS</div>
+<div class="stat-value" id="population">1,250</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">🚗 VEHICLES</div>
+<div class="stat-value" id="vehicleCount">86</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">🚦 TRAFFIC</div>
+<div class="stat-value green" id="traffic">LOW</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">⚡ ENERGY</div>
+<div class="stat-value green" id="energy">94%</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">💧 WATER</div>
+<div class="stat-value green" id="water">91%</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">👤 ACTIVE</div>
+<div class="stat-value green" id="activeCitizens">0</div>
+</div>
+
+</div>
+
+
+<!-- LIVE CITY -->
+
+<div class="city-box">
+
+<div class="city-header">
+
+<strong>🌐 LIVE VIRTUAL CITY</strong>
+
+<span>
+Citizens • Vehicles • Buildings
+</span>
+
+</div>
+
+<canvas
+id="cityCanvas"
+width="1200"
+height="600">
+</canvas>
+
+<div class="legend">
+
+<span>🏠 Home</span>
+<span>🏫 School</span>
+<span>🏥 Hospital</span>
+<span>🏢 Business</span>
+<span>🛒 Market</span>
+<span>🚗 Vehicle</span>
+<span>👤 Citizen</span>
+
+</div>
+
+</div>
+
+
+<!-- CITIZEN LIFE -->
+
+<h2 class="section-title">
+👥 Citizen Life
+</h2>
+
+<div class="panels">
+
+
+<div class="panel">
+
+<h3>
+🧑‍🤝‍🧑 Live Citizens
+</h3>
+
+<div
+class="citizen-list"
+id="citizenList">
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>
+🏙️ City Infrastructure
+</h3>
+
+<div class="system">
+<span>🏠 Homes</span>
+<strong>420</strong>
+</div>
+
+<div class="system">
+<span>🏫 Schools</span>
+<strong>6</strong>
+</div>
+
+<div class="system">
+<span>🏥 Hospitals</span>
+<strong>2</strong>
+</div>
+
+<div class="system">
+<span>🏢 Businesses</span>
+<strong>84</strong>
+</div>
+
+<div class="system">
+<span>🛒 Markets</span>
+<strong>12</strong>
+</div>
+
+<div class="system">
+<span>🛣️ Roads</span>
+<strong>38 km</strong>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- AI -->
+
+<h2 class="section-title">
+🧠 NEXUS City Brain
+</h2>
+
+<div class="panel">
+
+<h3>
+Current AI Decision
+</h3>
+
+<p
+id="decision"
+style="color:#8290a3;font-size:12px;line-height:1.7">
+
+NEXUS AI is monitoring citizens,
+vehicles and city infrastructure.
+
+</p>
+
+</div>
+
+
+<!-- ADMIN -->
+
+<h2 class="section-title">
+🛡️ Admin Safety Controls
+</h2>
+
+<div class="panels">
+
+<div class="panel">
+
+<button onclick="pauseAI()">
+⏸️ Pause AI Autonomy
+</button>
+
+<button
+class="stop"
+onclick="emergencyStop()">
+
+🛑 Emergency Stop
+
+</button>
+
+<button
+class="restore"
+onclick="restoreAI()">
+
+🔄 Restore AI
+
+</button>
+
+</div>
+
+
+<div class="panel log" id="log">
+
+<div class="log-item">
+[SYSTEM] NEXUS CITY initialized.
+</div>
+
+<div class="log-item">
+[AI] City Brain online.
+</div>
+
+<div class="log-item">
+[CITIZENS] Daily routines loaded.
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+
+<footer>
+
+NEXUS CITY • PHASE 3 • CITIZEN LIFE SIMULATION
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+   CITY ENGINE
+===================================================== */
+
+const canvas =
+document.getElementById("cityCanvas");
+
+const ctx =
+canvas.getContext("2d");
+
+let aiActive=true;
+
+let cityDay=1;
+
+let cityMinutes=360;
+
+
+/* =====================================================
+   BUILDINGS
+===================================================== */
+
+const buildings=[
+
+{
+x:60,y:70,w:100,h:70,
+type:"home",
+name:"Home District A"
+},
+
+{
+x:190,y:70,w:100,h:70,
+type:"home",
+name:"Home District B"
+},
+
+{
+x:320,y:70,w:100,h:70,
+type:"home",
+name:"Home District C"
+},
+
+{
+x:60,y:430,w:100,h:70,
+type:"home",
+name:"Home District D"
+},
+
+{
+x:190,y:430,w:100,h:70,
+type:"home",
+name:"Home District E"
+},
+
+{
+x:500,y:70,w:150,h:90,
+type:"school",
+name:"Nexus School"
+},
+
+{
+x:850,y:70,w:150,h:90,
+type:"hospital",
+name:"Nexus Hospital"
+},
+
+{
+x:500,y:430,w:140,h:80,
+type:"business",
+name:"Tech District"
+},
+
+{
+x:680,y:430,w:140,h:80,
+type:"business",
+name:"City Offices"
+},
+
+{
+x:860,y:430,w:140,h:80,
+type:"market",
+name:"Central Market"
+}
+
+];
+
+
+/* =====================================================
+   CITIZEN DATA
+===================================================== */
+
+const roles=[
+
+"Student",
+"Teacher",
+"Doctor",
+"Engineer",
+"Shopkeeper",
+"Worker",
+"Driver",
+"Nurse"
+
+];
+
+
+const activities=[
+
+"Sleeping at home",
+"Going to school",
+"Going to work",
+"Working",
+"Shopping",
+"Returning home",
+"At hospital",
+"Relaxing"
+
+];
+
+
+let citizens=[];
+
+
+for(let i=0;i<40;i++){
+
+let role=
+roles[
+Math.floor(
+Math.random()*roles.length
+)
+];
+
+let homeX=
+80+
+Math.random()*260;
+
+let homeY=
+100+
+Math.random()*380;
+
+citizens.push({
+
+id:"CG-"+String(i+1).padStart(4,"0"),
+
+name:
+"Citizen "+String(i+1).padStart(3,"0"),
+
+role:role,
+
+x:homeX,
+
+y:homeY,
+
+homeX:homeX,
+
+homeY:homeY,
+
+targetX:
+500+Math.random()*500,
+
+targetY:
+100+Math.random()*400,
+
+speed:
+0.25+
+Math.random()*0.35,
+
+activity:
+activities[0],
+
+moving:false
+
+});
+
+}
+
+
+/* =====================================================
+   VEHICLES
+===================================================== */
+
+let vehicles=[];
+
+
+for(let i=0;i<20;i++){
+
+vehicles.push({
+
+x:
+Math.random()*1200,
+
+y:
+275+
+(Math.random()>0.5?35:-35),
+
+speed:
+0.5+
+Math.random()*1.2,
+
+direction:
+Math.random()>0.5?1:-1
+
+});
+
+}
+
+
+/* =====================================================
+   TIME + ACTIVITIES
+===================================================== */
+
+function getPeriod(){
+
+if(cityMinutes<420)
+return "Early Morning";
+
+if(cityMinutes<540)
+return "Morning";
+
+if(cityMinutes<780)
+return "School / Work";
+
+if(cityMinutes<960)
+return "Afternoon";
+
+if(cityMinutes<1140)
+return "Evening";
+
+return "Night";
+
+}
+
+
+function updateCitizenActivities(){
+
+let period=getPeriod();
+
+citizens.forEach(c=>{
+
+if(period==="Early Morning"){
+
+c.activity="Sleeping at home";
+c.moving=false;
+
+}
+
+else if(period==="Morning"){
+
+if(
+c.role==="Student" ||
+c.role==="Teacher"
+){
+
+c.activity="Going to school";
+
+c.targetX=575;
+c.targetY=115;
+
+c.moving=true;
+
+}else{
+
+c.activity="Going to work";
+
+c.targetX=750;
+c.targetY=470;
+
+c.moving=true;
+
+}
+
+}
+
+else if(period==="School / Work"){
+
+if(
+c.role==="Student" ||
+c.role==="Teacher"
+){
+
+c.activity="At school";
+
+}else{
+
+c.activity="Working";
+
+}
+
+c.moving=false;
+
+}
+
+else if(period==="Afternoon"){
+
+c.activity="Shopping";
+
+c.targetX=930;
+c.targetY=470;
+
+c.moving=true;
+
+}
+
+else if(period==="Evening"){
+
+c.activity="Returning home";
+
+c.targetX=c.homeX;
+c.targetY=c.homeY;
+
+c.moving=true;
+
+}
+
+else{
+
+c.activity="Sleeping at home";
+
+c.targetX=c.homeX;
+c.targetY=c.homeY;
+
+c.moving=true;
+
+}
+
+});
+
+}
+
+
+/* =====================================================
+   MOVE CITIZENS
+===================================================== */
+
+function moveCitizens(){
+
+if(!aiActive)
+return;
+
+citizens.forEach(c=>{
+
+if(!c.moving)
+return;
+
+let dx=
+c.targetX-c.x;
+
+let dy=
+c.targetY-c.y;
+
+let distance=
+Math.sqrt(dx*dx+dy*dy);
+
+if(distance<5){
+
+c.x=c.targetX;
+c.y=c.targetY;
+
+c.moving=false;
+
+return;
+
+}
+
+c.x +=
+(dx/distance)*c.speed;
+
+c.y +=
+(dy/distance)*c.speed;
+
+});
+
+}
+
+
+/* =====================================================
+   VEHICLES
+===================================================== */
+
+function moveVehicles(){
+
+if(!aiActive)
+return;
+
+vehicles.forEach(v=>{
+
+v.x +=
+v.speed*v.direction;
+
+if(v.x>1200)
+v.x=-30;
+
+if(v.x<-30)
+v.x=1200;
+
+});
+
+}
+
+
+/* =====================================================
+   DRAW CITY
+===================================================== */
+
+function drawCity(){
+
+ctx.clearRect(
+0,0,
+canvas.width,
+canvas.height
+);
+
+
+/* Ground */
+
+ctx.fillStyle="#111c25";
+
+ctx.fillRect(
+0,0,
+canvas.width,
+canvas.height
+);
+
+
+/* Roads */
+
+ctx.fillStyle="#28333d";
+
+ctx.fillRect(
+0,250,
+1200,
+100
+);
+
+ctx.fillRect(
+450,0,
+100,
+600
+);
+
+
+/* Road markings */
+
+ctx.strokeStyle="#69747f";
+
+ctx.lineWidth=2;
+
+ctx.setLineDash(
+[18,15]
+);
+
+ctx.beginPath();
+
+ctx.moveTo(
+0,300
+);
+
+ctx.lineTo(
+1200,300
+);
+
+ctx.stroke();
+
+
+ctx.beginPath();
+
+ctx.moveTo(
+500,0
+);
+
+ctx.lineTo(
+500,600
+);
+
+ctx.stroke();
+
+
+ctx.setLineDash([]);
+
+
+/* Buildings */
+
+buildings.forEach(b=>{
+
+ctx.fillStyle=
+"#344657";
+
+if(b.type==="school")
+ctx.fillStyle="#43566b";
+
+if(b.type==="hospital")
+ctx.fillStyle="#4b4e5b";
+
+if(b.type==="business")
+ctx.fillStyle="#39495c";
+
+if(b.type==="market")
+ctx.fillStyle="#465342";
+
+ctx.fillRect(
+b.x,b.y,
+b.w,b.h
+);
+
+ctx.strokeStyle="#718093";
+
+ctx.strokeRect(
+b.x,b.y,
+b.w,b.h
+);
+
+
+let emoji="🏠";
+
+if(b.type==="school")
+emoji="🏫";
+
+if(b.type==="hospital")
+emoji="🏥";
+
+if(b.type==="business")
+emoji="🏢";
+
+if(b.type==="market")
+emoji="🛒";
+
+
+ctx.font="22px Arial";
+
+ctx.fillText(
+emoji,
+b.x+10,
+b.y+28
+);
+
+
+ctx.fillStyle="#b0bac7";
+
+ctx.font="10px Arial";
+
+ctx.fillText(
+b.name,
+b.x+10,
+b.y+b.h-12
+);
+
+});
+
+
+/* Vehicles */
+
+vehicles.forEach(v=>{
+
+ctx.fillStyle="#dce2e8";
+
+ctx.fillRect(
+v.x,
+v.y,
+22,
+10
+);
+
+ctx.fillStyle="#202a34";
+
+ctx.fillRect(
+v.x+5,
+v.y+2,
+5,
+5
+);
+
+});
+
+
+/* Citizens */
+
+citizens.forEach(c=>{
+
+ctx.fillStyle=
+c.activity==="At school"
+?"#9cc7ff":
+"#e1e6eb";
+
+ctx.beginPath();
+
+ctx.arc(
+c.x,
+c.y,
+4,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+});
+
+}
+
+
+/* =====================================================
+   CITIZEN PANEL
+===================================================== */
+
+function updateCitizenPanel(){
+
+const list=
+document.getElementById(
+"citizenList"
+);
+
+list.innerHTML="";
+
+
+let active=0;
+
+
+citizens.slice(0,12)
+.forEach(c=>{
+
+if(c.moving)
+active++;
+
+
+const div=
+document.createElement("div");
+
+div.className="citizen";
+
+
+div.innerHTML=`
+
+<div class="citizen-top">
+
+<div class="citizen-name">
+👤 ${c.name}
+</div>
+
+<div class="citizen-id">
+${c.id}
+</div>
+
+</div>
+
+<div class="citizen-info">
+Role: ${c.role}
+</div>
+
+<div class="citizen-info activity">
+Activity: ${c.activity}
+</div>
+
+`;
+
+list.appendChild(div);
+
+});
+
+
+document.getElementById(
+"activeCitizens"
+).textContent=active;
+
+}
+
+
+/* =====================================================
+   CITY CLOCK
+===================================================== */
+
+function updateClock(){
+
+if(!aiActive)
+return;
+
+cityMinutes+=5;
+
+if(cityMinutes>=1440){
+
+cityMinutes=0;
+
+cityDay++;
+
+}
+
+let hours=
+Math.floor(
+cityMinutes/60
+);
+
+let minutes=
+cityMinutes%60;
+
+
+document.getElementById(
+"cityClock"
+).textContent=
+
+"Day "+
+cityDay+
+" • "+
+String(hours).padStart(2,"0")+
+":"+
+String(minutes).padStart(2,"0")+
+" • "+
+getPeriod();
+
+}
+
+
+/* =====================================================
+   AI BRAIN
+===================================================== */
+
+function updateAI(){
+
+if(!aiActive)
+return;
+
+
+let decisions=[
+
+"AI is monitoring citizen routines.",
+
+"AI is analyzing school attendance.",
+
+"AI is monitoring hospital readiness.",
+
+"AI is optimizing traffic flow.",
+
+"AI is analyzing business activity.",
+
+"AI is monitoring city resource demand.",
+
+"AI is checking citizen movement patterns."
+
+];
+
+
+let decision=
+decisions[
+Math.floor(
+Math.random()*decisions.length
+)
+];
+
+
+document.getElementById(
+"decision"
+).textContent=decision;
+
+}
+
+
+/* =====================================================
+   EVENT LOG
+===================================================== */
+
+function addLog(message){
+
+const log=
+document.getElementById("log");
+
+const item=
+document.createElement("div");
+
+item.className="log-item";
+
+item.textContent=
+"["+
+new Date().toLocaleTimeString()+
+"] "+
+message;
+
+log.prepend(item);
+
+}
+
+
+/* =====================================================
+   ADMIN CONTROLS
+===================================================== */
+
+function pauseAI(){
+
+aiActive=false;
+
+document.getElementById(
+"aiStatus"
+).textContent=
+"● AI AUTONOMY PAUSED";
+
+document.getElementById(
+"aiStatus"
+).style.color=
+"#f1c85b";
+
+document.getElementById(
+"simStatus"
+).textContent=
+"Simulation paused";
+
+document.getElementById(
+"decision"
+).textContent=
+"AI autonomy paused by administrator.";
+
+addLog(
+"ADMIN: AI autonomy paused."
+);
+
+}
+
+
+function emergencyStop(){
+
+aiActive=false;
+
+document.getElementById(
+"aiStatus"
+).textContent=
+"● EMERGENCY STOP";
+
+document.getElementById(
+"aiStatus"
+).style.color=
+"#ff7070";
+
+document.getElementById(
+"simStatus"
+).textContent=
+"Emergency stop active";
+
+document.getElementById(
+"decision"
+).textContent=
+"Emergency stop activated. Simulation movement disabled.";
+
+addLog(
+"ADMIN: EMERGENCY STOP ACTIVATED."
+);
+
+}
+
+
+function restoreAI(){
+
+aiActive=true;
+
+document.getElementById(
+"aiStatus"
+).textContent=
+"● AI AUTONOMY ACTIVE";
+
+document.getElementById(
+"aiStatus"
+).style.color=
+"#65e58a";
+
+document.getElementById(
+"simStatus"
+).textContent=
+"Simulation running";
+
+document.getElementById(
+"decision"
+).textContent=
+"NEXUS AI has resumed city simulation.";
+
+addLog(
+"ADMIN: AI autonomy restored."
+);
+
+}
+
+
+/* =====================================================
+   MAIN LOOP
+===================================================== */
+
+function simulationLoop(){
+
+moveCitizens();
+
+moveVehicles();
+
+drawCity();
+
+updateCitizenPanel();
+
+requestAnimationFrame(
+simulationLoop
+);
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+updateCitizenActivities();
+
+simulationLoop();
+
+setInterval(
+updateClock,
+1000
+);
+
+setInterval(
+updateCitizenActivities,
+10000
+);
+
+setInterval(
+updateAI,
+4000
+);
+
+</script>
+
+</body>
+</html>
