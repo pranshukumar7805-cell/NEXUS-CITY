@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NEXUS CITY | AI City Simulation</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#060a10;
+  color:#fff;
+  min-height:100vh;
+}
+
+header{
+  background:#0b111a;
+  border-bottom:1px solid #1c2a3a;
+  padding:16px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.header{
+  max-width:1250px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:bold;
+  letter-spacing:3px;
+}
+
+.subtitle{
+  color:#718097;
+  font-size:10px;
+  margin-top:4px;
+  letter-spacing:1px;
+}
+
+.status{
+  padding:9px 13px;
+  border-radius:20px;
+  border:1px solid #285536;
+  background:#0c1911;
+  color:#65e58a;
+  font-size:11px;
+}
+
+main{
+  max-width:1250px;
+  margin:auto;
+  padding:20px 15px 40px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+h2{
+  font-size:22px;
+}
+
+.clock{
+  color:#7d8ba0;
+  font-size:12px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#0c131d;
+  border:1px solid #1a2939;
+  border-radius:12px;
+  padding:13px;
+}
+
+.stat-title{
+  color:#728096;
+  font-size:10px;
+  margin-bottom:7px;
+}
+
+.stat-value{
+  font-size:19px;
+  font-weight:bold;
+}
+
+.green{color:#65e58a}
+.yellow{color:#f1c85b}
+.red{color:#ff7070}
+
+.city-box{
+  background:#081019;
+  border:1px solid #1a2b3c;
+  border-radius:15px;
+  overflow:hidden;
+  position:relative;
+}
+
+.city-header{
+  padding:13px 15px;
+  background:#0b141f;
+  border-bottom:1px solid #1a2939;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.city-header span{
+  color:#728096;
+  font-size:11px;
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  background:#101923;
+}
+
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  padding:11px 15px;
+  background:#0b141f;
+  color:#8290a4;
+  font-size:10px;
+}
+
+.section-title{
+  margin:25px 0 12px;
+  font-size:17px;
+}
+
+.panels{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.panel{
+  background:#0c131d;
+  border:1px solid #1a2939;
+  border-radius:13px;
+  padding:16px;
+}
+
+.panel h3{
+  font-size:14px;
+  margin-bottom:13px;
+}
+
+.system{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid #182433;
+  font-size:12px;
+}
+
+.system:last-child{
+  border-bottom:0;
+}
+
+.system span:first-child{
+  color:#8390a3;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:9px;
+  border:1px solid #26384b;
+  background:#101b27;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  background:#172637;
+}
+
+.stop{
+  color:#ff7777;
+  border-color:#5b3030;
+}
+
+.restore{
+  color:#70e893;
+  border-color:#295738;
+}
+
+.log{
+  max-height:230px;
+  overflow-y:auto;
+}
+
+.log-item{
+  padding:9px 0;
+  border-bottom:1px solid #182433;
+  color:#8491a3;
+  font-size:11px;
+}
+
+.log-item:last-child{
+  border:0;
+}
+
+footer{
+  text-align:center;
+  padding:25px;
+  color:#4f5c6d;
+  font-size:10px;
+}
+
+@media(max-width:900px){
+  .stats{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+@media(max-width:600px){
+  .header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .panels{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header">
+    <div>
+      <div class="logo">🏙️ NEXUS CITY</div>
+      <div class="subtitle">AUTONOMOUS AI CITY SIMULATION</div>
+    </div>
+
+    <div class="status" id="aiStatus">
+      ● AI AUTONOMY ACTIVE
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="top">
+    <div>
+      <h2>City Command Center</h2>
+      <div class="clock" id="cityClock">Day 1 • 06:00</div>
+    </div>
+
+    <div class="clock" id="simStatus">
+      Simulation running
+    </div>
+  </div>
+
+  <!-- CITY STATISTICS -->
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-title">👥 CITIZENS</div>
+      <div class="stat-value" id="population">1,250</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">🚗 VEHICLES</div>
+      <div class="stat-value" id="vehicles">86</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">🚦 TRAFFIC</div>
+      <div class="stat-value green" id="traffic">LOW</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">⚡ ENERGY</div>
+      <div class="stat-value green" id="energy">94%</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">💧 WATER</div>
+      <div class="stat-value green" id="water">91%</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">🌱 AIR QUALITY</div>
+      <div class="stat-value green" id="air">GOOD</div>
+    </div>
+
+  </div>
+
+
+  <!-- LIVE CITY -->
+
+  <div class="city-box">
+
+    <div class="city-header">
+      <strong>🌐 LIVE VIRTUAL CITY</strong>
+      <span>AI simulation environment</span>
+    </div>
+
+    <canvas id="cityCanvas" width="1200" height="600"></canvas>
+
+    <div class="legend">
+      <span>🏠 Residential</span>
+      <span>🏫 School</span>
+      <span>🏥 Hospital</span>
+      <span>🏢 Business</span>
+      <span>🚗 Vehicle</span>
+      <span>👤 Citizen</span>
+    </div>
+
+  </div>
+
+
+  <!-- SYSTEMS -->
+
+  <h2 class="section-title">🧠 City Systems</h2>
+
+  <div class="panels">
+
+    <div class="panel">
+
+      <h3>🏙️ Infrastructure</h3>
+
+      <div class="system">
+        <span>🏠 Houses</span>
+        <strong>420</strong>
+      </div>
+
+      <div class="system">
+        <span>🏢 Businesses</span>
+        <strong>84</strong>
+      </div>
+
+      <div class="system">
+        <span>🏫 Schools</span>
+        <strong>6</strong>
+      </div>
+
+      <div class="system">
+        <span>🏥 Hospitals</span>
+        <strong>2</strong>
+      </div>
+
+      <div class="system">
+        <span>🛣️ Roads</span>
+        <strong>38 km</strong>
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <h3>🛡️ Admin Safety</h3>
+
+      <button onclick="pauseAI()">
+        ⏸️ Pause AI Autonomy
+      </button>
+
+      <button class="stop" onclick="emergencyStop()">
+        🛑 Emergency Stop
+      </button>
+
+      <button class="restore" onclick="restoreAI()">
+        🔄 Restore AI
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- AI BRAIN -->
+
+  <h2 class="section-title">🧠 NEXUS City Brain</h2>
+
+  <div class="panel">
+
+    <h3>Current AI Decision</h3>
+
+    <p id="decision"
+       style="color:#8290a3;font-size:12px;line-height:1.7">
+      NEXUS AI is monitoring citizens, vehicles,
+      infrastructure and city resources.
+    </p>
+
+  </div>
+
+
+  <!-- EVENT LOG -->
+
+  <h2 class="section-title">📝 City Event Log</h2>
+
+  <div class="panel log" id="log">
+
+    <div class="log-item">
+      [SYSTEM] NEXUS CITY initialized.
+    </div>
+
+    <div class="log-item">
+      [AI] City Brain online.
+    </div>
+
+    <div class="log-item">
+      [CITY] Virtual population loaded.
+    </div>
+
+    <div class="log-item">
+      [TRAFFIC] Vehicle simulation started.
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  NEXUS CITY • PHASE 2 • VIRTUAL CITY SIMULATION
+</footer>
+
+
+<script>
+
+/* =====================================================
+   NEXUS CITY SIMULATION ENGINE
+   ===================================================== */
+
+const canvas = document.getElementById("cityCanvas");
+const ctx = canvas.getContext("2d");
+
+let aiActive = true;
+let emergency = false;
+
+let cityDay = 1;
+let cityMinutes = 360;
+
+
+/* =====================================================
+   BUILDINGS
+   ===================================================== */
+
+const buildings = [
+
+  {x:70,y:80,w:100,h:75,type:"house",name:"Residential A"},
+  {x:200,y:80,w:100,h:75,type:"house",name:"Residential B"},
+  {x:330,y:80,w:100,h:75,type:"house",name:"Residential C"},
+
+  {x:70,y:410,w:100,h:75,type:"house",name:"Residential D"},
+  {x:200,y:410,w:100,h:75,type:"house",name:"Residential E"},
+
+  {x:500,y:70,w:150,h:90,type:"school",name:"Nexus School"},
+
+  {x:850,y:70,w:150,h:90,type:"hospital",name:"Nexus Hospital"},
+
+  {x:500,y:410,w:140,h:85,type:"business",name:"Tech District"},
+  {x:690,y:410,w:140,h:85,type:"business",name:"Market Center"},
+  {x:880,y:410,w:140,h:85,type:"business",name:"City Offices"}
+
+];
+
+
+/* =====================================================
+   VEHICLES
+   ===================================================== */
+
+let vehicles = [];
+
+for(let i=0;i<18;i++){
+
+  vehicles.push({
+    x:Math.random()*1100+40,
+    y:285 + (Math.random()>0.5 ? -20 : 20),
+    speed:0.6+Math.random()*1.2,
+    direction:Math.random()>0.5 ? 1 : -1
+  });
+
+}
+
+
+/* =====================================================
+   CITIZENS
+   ===================================================== */
+
+let citizens = [];
+
+for(let i=0;i<30;i++){
+
+  citizens.push({
+    x:Math.random()*1100+30,
+    y:Math.random()*520+35,
+    speed:0.15+Math.random()*0.35,
+    dx:Math.random()>0.5 ? 1 : -1,
+    dy:Math.random()>0.5 ? 1 : -1
+  });
+
+}
+
+
+/* =====================================================
+   DRAW CITY
+   ===================================================== */
+
+function drawCity(){
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  /* Ground */
+
+  ctx.fillStyle="#111c25";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+
+  /* Roads */
+
+  ctx.fillStyle="#28333d";
+
+  ctx.fillRect(0,250,1200,95);
+  ctx.fillRect(445,0,95,600);
+
+
+  /* Road lines */
+
+  ctx.strokeStyle="#66717c";
+  ctx.setLineDash([18,15]);
+  ctx.lineWidth=2;
+
+  ctx.beginPath();
+  ctx.moveTo(0,297);
+  ctx.lineTo(1200,297);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(492,0);
+  ctx.lineTo(492,600);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+
+
+  /* Buildings */
+
+  buildings.forEach(b=>{
+
+    if(b.type==="house")
+      ctx.fillStyle="#344657";
+
+    if(b.type==="school")
+      ctx.fillStyle="#43566b";
+
+    if(b.type==="hospital")
+      ctx.fillStyle="#4a4d5a";
+
+    if(b.type==="business")
+      ctx.fillStyle="#39495c";
+
+    ctx.fillRect(b.x,b.y,b.w,b.h);
+
+    ctx.strokeStyle="#718093";
+    ctx.strokeRect(b.x,b.y,b.w,b.h);
+
+
+    ctx.fillStyle="#ffffff";
+    ctx.font="12px Arial";
+
+    let emoji="🏠";
+
+    if(b.type==="school") emoji="🏫";
+    if(b.type==="hospital") emoji="🏥";
+    if(b.type==="business") emoji="🏢";
+
+    ctx.fillText(
+      emoji,
+      b.x+10,
+      b.y+25
+    );
+
+    ctx.fillStyle="#aab5c3";
+    ctx.font="10px Arial";
+
+    ctx.fillText(
+      b.name,
+      b.x+10,
+      b.y+b.h-12
+    );
+
+  });
+
+
+  /* Vehicles */
+
+  vehicles.forEach(v=>{
+
+    ctx.fillStyle="#d9dfe5";
+
+    ctx.fillRect(
+      v.x,
+      v.y,
+      20,
+      10
+    );
+
+    ctx.fillStyle="#202a34";
+
+    ctx.fillRect(
+      v.x+4,
+      v.y+2,
+      5,
+      5
+    );
+
+  });
+
+
+  /* Citizens */
+
+  citizens.forEach(c=>{
+
+    ctx.fillStyle="#d9e0e8";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      c.x,
+      c.y,
+      4,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+  });
+
+
+}
+
+
+/* =====================================================
+   MOVE VEHICLES
+   ===================================================== */
+
+function updateVehicles(){
+
+  if(!aiActive) return;
+
+  vehicles.forEach(v=>{
+
+    v.x += v.speed*v.direction;
+
+    if(v.x>1180){
+      v.x=-30;
+    }
+
+    if(v.x<-30){
+      v.x=1180;
+    }
+
+  });
+
+}
+
+
+/* =====================================================
+   MOVE CITIZENS
+   ===================================================== */
+
+function updateCitizens(){
+
+  if(!aiActive) return;
+
+  citizens.forEach(c=>{
+
+    c.x += c.dx*c.speed;
+    c.y += c.dy*c.speed;
+
+    if(c.x<10 || c.x>1190)
+      c.dx*=-1;
+
+    if(c.y<10 || c.y>590)
+      c.dy*=-1;
+
+  });
+
+}
+
+
+/* =====================================================
+   CITY TIME
+   ===================================================== */
+
+function updateTime(){
+
+  if(!aiActive) return;
+
+  cityMinutes++;
+
+  if(cityMinutes>=1440){
+
+    cityMinutes=0;
+    cityDay++;
+
+  }
+
+  let hours=Math.floor(cityMinutes/60);
+  let minutes=cityMinutes%60;
+
+  let hh=String(hours).padStart(2,"0");
+  let mm=String(minutes).padStart(2,"0");
+
+  document.getElementById("cityClock").textContent =
+    "Day "+cityDay+" • "+hh+":"+mm;
+
+}
+
+
+/* =====================================================
+   CITY AI
+   ===================================================== */
+
+function cityAI(){
+
+  if(!aiActive) return;
+
+  let traffic=Math.floor(
+    20+Math.random()*60
+  );
+
+  let energy=Math.floor(
+    88+Math.random()*9
+  );
+
+  let water=Math.floor(
+    86+Math.random()*10
+  );
+
+
+  document.getElementById("energy").textContent =
+    energy+"%";
+
+  document.getElementById("water").textContent =
+    water+"%";
+
+
+  let trafficElement =
+    document.getElementById("traffic");
+
+
+  if(traffic<45){
+
+    trafficElement.textContent="LOW";
+    trafficElement.className="stat-value green";
+
+  }
+
+  else if(traffic<70){
+
+    trafficElement.textContent="MEDIUM";
+    trafficElement.className="stat-value yellow";
+
+  }
+
+  else{
+
+    trafficElement.textContent="HIGH";
+    trafficElement.className="stat-value red";
+
+  }
+
+
+  let decisions=[
+
+    "AI is optimizing traffic signal timing.",
+
+    "AI is monitoring hospital capacity.",
+
+    "AI is balancing city energy demand.",
+
+    "AI is monitoring water consumption.",
+
+    "AI is analyzing citizen movement.",
+
+    "AI is checking environmental conditions."
+
+  ];
+
+
+  let decision =
+    decisions[
+      Math.floor(
+        Math.random()*decisions.length
+      )
+    ];
+
+
+  document.getElementById("decision")
+    .textContent=decision;
+
+}
+
+
+/* =====================================================
+   EVENT LOG
+   ===================================================== */
+
+function addLog(message){
+
+  const log=document.getElementById("log");
+
+  const item=document.createElement("div");
+
+  item.className="log-item";
+
+  item.textContent=
+    "["+
+    new Date().toLocaleTimeString()+
+    "] "+
+    message;
+
+  log.prepend(item);
+
+}
+
+
+/* =====================================================
+   AI CONTROLS
+   ===================================================== */
+
+function pauseAI(){
+
+  aiActive=false;
+  emergency=false;
+
+  document.getElementById("aiStatus")
+    .textContent="● AI AUTONOMY PAUSED";
+
+  document.getElementById("aiStatus")
+    .style.color="#f1c85b";
+
+  document.getElementById("simStatus")
+    .textContent="Simulation paused";
+
+  document.getElementById("decision")
+    .textContent=
+    "AI autonomy has been paused by the administrator. City systems remain visible for monitoring.";
+
+  addLog("ADMIN: AI autonomy paused.");
+
+}
+
+
+function emergencyStop(){
+
+  aiActive=false;
+  emergency=true;
+
+  document.getElementById("aiStatus")
+    .textContent="● EMERGENCY STOP";
+
+  document.getElementById("aiStatus")
+    .style.color="#ff7070";
+
+  document.getElementById("simStatus")
+    .textContent="Emergency stop active";
+
+  document.getElementById("decision")
+    .textContent=
+    "Emergency stop activated. Autonomous simulation decisions are disabled.";
+
+  addLog("ADMIN: EMERGENCY STOP ACTIVATED.");
+
+}
+
+
+function restoreAI(){
+
+  aiActive=true;
+  emergency=false;
+
+  document.getElementById("aiStatus")
+    .textContent="● AI AUTONOMY ACTIVE";
+
+  document.getElementById("aiStatus")
+    .style.color="#65e58a";
+
+  document.getElementById("simStatus")
+    .textContent="Simulation running";
+
+  document.getElementById("decision")
+    .textContent=
+    "NEXUS AI has resumed monitoring and autonomous city simulation.";
+
+  addLog("ADMIN: AI autonomy restored.");
+
+}
+
+
+/* =====================================================
+   SIMULATION LOOP
+   ===================================================== */
+
+function simulationLoop(){
+
+  updateVehicles();
+  updateCitizens();
+
+  drawCity();
+
+  requestAnimationFrame(simulationLoop);
+
+}
+
+
+/* =====================================================
+   START
+   ===================================================== */
+
+setInterval(updateTime,1000);
+
+setInterval(cityAI,3000);
+
+simulationLoop();
+
+</script>
+
+</body>
+</html>
