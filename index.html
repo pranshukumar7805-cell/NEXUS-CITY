@@ -1,1 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>NEXUS CITY | AI Command Center</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #070b12;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px;
+      border-bottom: 1px solid #1c2a3a;
+      background: #0b111b;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .brand h1 {
+      font-size: 26px;
+      letter-spacing: 3px;
+    }
+
+    .brand p {
+      color: #7f8da3;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .ai-status {
+      padding: 9px 14px;
+      border: 1px solid #24452f;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #65e58a;
+      background: #0d1b13;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 25px 18px 40px;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h2 {
+      font-size: 28px;
+      margin-bottom: 7px;
+    }
+
+    .welcome p {
+      color: #8492a6;
+    }
+
+    .systems {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      background: #0c131e;
+      border: 1px solid #1b2a3a;
+      border-radius: 14px;
+      padding: 18px;
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      border-color: #38516b;
+      transform: translateY(-2px);
+    }
+
+    .icon {
+      font-size: 25px;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: 15px;
+      margin-bottom: 9px;
+    }
+
+    .value {
+      font-size: 23px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .label {
+      color: #7f8da3;
+      font-size: 12px;
+    }
+
+    .healthy {
+      color: #65e58a;
+    }
+
+    .warning {
+      color: #f4c95d;
+    }
+
+    .danger {
+      color: #ff7070;
+    }
+
+    .section-title {
+      margin: 35px 0 15px;
+      font-size: 18px;
+    }
+
+    .brain {
+      background: #0c131e;
+      border: 1px solid #1b2a3a;
+      border-radius: 15px;
+      padding: 20px;
+    }
+
+    .brain-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .brain-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brain-circle {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #111d2c;
+      display: grid;
+      place-items: center;
+      font-size: 23px;
+    }
+
+    .brain-title h3 {
+      font-size: 17px;
+    }
+
+    .brain-title p {
+      color: #7f8da3;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .decision {
+      background: #080e17;
+      border-radius: 10px;
+      padding: 15px;
+      border-left: 3px solid #65e58a;
+    }
+
+    .decision p {
+      color: #aab6c7;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      border: 1px solid #26384c;
+      background: #0d1723;
+      color: white;
+      padding: 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #142233;
+    }
+
+    .emergency {
+      border-color: #632d2d;
+      color: #ff7777;
+    }
+
+    .restore {
+      border-color: #295b3a;
+      color: #72e795;
+    }
+
+    .log {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .log-item {
+      padding: 12px;
+      border-bottom: 1px solid #182433;
+      color: #9ba8b9;
+      font-size: 12px;
+    }
+
+    .log-item:last-child {
+      border-bottom: none;
+    }
+
+    footer {
+      text-align: center;
+      color: #536174;
+      font-size: 11px;
+      padding: 25px;
+      border-top: 1px solid #172332;
+    }
+
+    @media (max-width: 900px) {
+      .systems {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 550px) {
+      .header-content {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .systems {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome h2 {
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="brand">
+      <h1>🏙️ NEXUS CITY</h1>
+      <p>AI-POWERED CITY COMMAND CENTER</p>
+    </div>
+
+    <div class="ai-status" id="aiStatus">
+      ● AI AUTONOMY ACTIVE
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="welcome">
+    <h2>City Overview</h2>
+    <p>Real-time simulation control and city intelligence dashboard.</p>
+  </div>
+
+  <div class="systems">
+
+    <div class="card">
+      <div class="icon">🚦</div>
+      <h3>Traffic</h3>
+      <div class="value healthy">Normal</div>
+      <div class="label">Traffic flow stable</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>Energy</h3>
+      <div class="value healthy">94%</div>
+      <div class="label">Grid availability</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">💧</div>
+      <h3>Water</h3>
+      <div class="value healthy">91%</div>
+      <div class="label">Supply capacity</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">🌱</div>
+      <h3>Environment</h3>
+      <div class="value healthy">Good</div>
+      <div class="label">Air quality stable</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">🚑</div>
+      <h3>Emergency</h3>
+      <div class="value healthy">Clear</div>
+      <div class="label">No active incidents</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">🚌</div>
+      <h3>Transport</h3>
+      <div class="value">87%</div>
+      <div class="label">Network efficiency</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">👥</div>
+      <h3>Citizens</h3>
+      <div class="value">125,480</div>
+      <div class="label">Simulated population</div>
+    </div>
+
+    <div class="card">
+      <div class="icon">🏢</div>
+      <h3>Businesses</h3>
+      <div class="value">8,742</div>
+      <div class="label">Active entities</div>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">🧠 City Brain</h2>
+
+  <div class="brain">
+
+    <div class="brain-top">
+
+      <div class="brain-title">
+        <div class="brain-circle">🧠</div>
+
+        <div>
+          <h3>NEXUS AI</h3>
+          <p>Autonomous city intelligence</p>
+        </div>
+      </div>
+
+      <div class="ai-status" id="brainStatus">
+        OPERATIONAL
+      </div>
+
+    </div>
+
+    <div class="decision">
+      <p id="decisionText">
+        AI is monitoring city systems and continuously evaluating
+        traffic, energy, water, environment and emergency conditions.
+      </p>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">🛡️ Admin Safety Controls</h2>
+
+  <div class="controls">
+
+    <button onclick="pauseAI()">
+      ⏸️ Pause AI Autonomy
+    </button>
+
+    <button class="emergency" onclick="emergencyStop()">
+      🛑 Emergency Stop
+    </button>
+
+    <button class="restore" onclick="restoreAI()">
+      🔄 Restore AI
+    </button>
+
+  </div>
+
+  <h2 class="section-title">📝 Decision & Event Log</h2>
+
+  <div class="brain log" id="log">
+
+    <div class="log-item">
+      [SYSTEM] NEXUS CITY initialized.
+    </div>
+
+    <div class="log-item">
+      [AI] City Brain online.
+    </div>
+
+    <div class="log-item">
+      [TRAFFIC] Traffic network operating normally.
+    </div>
+
+    <div class="log-item">
+      [ENERGY] Energy grid stable at 94%.
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  NEXUS CITY • AI CITY SIMULATION • PHASE 1
+</footer>
+
+<script>
+
+  let aiActive = true;
+
+  function addLog(message) {
+    const log = document.getElementById("log");
+
+    const item = document.createElement("div");
+    item.className = "log-item";
+
+    const time = new Date().toLocaleTimeString();
+
+    item.textContent = "[" + time + "] " + message;
+
+    log.prepend(item);
+  }
+
+  function pauseAI() {
+
+    aiActive = false;
+
+    document.getElementById("aiStatus").textContent =
+      "● AI AUTONOMY PAUSED";
+
+    document.getElementById("aiStatus").style.color =
+      "#f4c95d";
+
+    document.getElementById("brainStatus").textContent =
+      "PAUSED";
+
+    document.getElementById("decisionText").textContent =
+      "AI autonomy has been paused by the administrator. City systems remain available for monitoring.";
+
+    addLog("ADMIN: AI autonomy paused.");
+
+  }
+
+  function emergencyStop() {
+
+    aiActive = false;
+
+    document.getElementById("aiStatus").textContent =
+      "● EMERGENCY STOP";
+
+    document.getElementById("aiStatus").style.color =
+      "#ff7070";
+
+    document.getElementById("brainStatus").textContent =
+      "EMERGENCY STOP";
+
+    document.getElementById("decisionText").textContent =
+      "Emergency stop activated. Autonomous AI decisions are disabled.";
+
+    addLog("ADMIN: EMERGENCY STOP ACTIVATED.");
+
+  }
+
+  function restoreAI() {
+
+    aiActive = true;
+
+    document.getElementById("aiStatus").textContent =
+      "● AI AUTONOMY ACTIVE";
+
+    document.getElementById("aiStatus").style.color =
+      "#65e58a";
+
+    document.getElementById("brainStatus").textContent =
+      "OPERATIONAL";
+
+    document.getElementById("decisionText").textContent =
+      "AI is monitoring city systems and continuously evaluating city conditions.";
+
+    addLog("ADMIN: AI autonomy restored.");
+
+  }
+
+</script>
+
+</body>
+  </html>
