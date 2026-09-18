@@ -258,3 +258,4 @@ startEmergencySimulation();
 
 // Initial display
 setTimeout(updateEmergencyPanel, 500);
+window.createEmergency = createEmergency;
