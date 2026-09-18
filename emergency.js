@@ -259,3 +259,11 @@ startEmergencySimulation();
 // Initial display
 setTimeout(updateEmergencyPanel, 500);
 window.createEmergency = createEmergency;
+
+const emergencyButton = document.getElementById("emergencyBtn");
+
+if (emergencyButton) {
+    emergencyButton.addEventListener("click", function () {
+        createEmergency();
+    });
+}
